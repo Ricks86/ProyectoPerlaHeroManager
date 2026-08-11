@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="ProyectoRol - Gestor de Partidas de Rol de Tablero en Tiempo Real. Asistente de Creación de Personajes (Sistema Vieja Escuela + Homebrew)">
+    <title>Creación de Personaje | ProyectoRol</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+    <!-- HEADER SUPERIOR DE LA APLICACIÓN -->
+    <header class="app-header">
+        <div class="header-container">
+            <div class="brand-wrapper">
+                <div class="brand-logo">⚔️</div>
+                <div>
+                    <h1 class="brand-title">ProyectoRol</h1>
+                    <span class="brand-subtitle">Gestor de Partidas TTRPG en Tiempo Real</span>
+                </div>
+            </div>
+            <div class="system-badge">
+                📜 Sistema Vieja Escuela (Manual Oficial VE_jdr.pdf)
+            </div>
+        </div>
+    </header>
+
+    <!-- CONTENIDO PRINCIPAL -->
+    <main class="main-content">
+        <div class="wizard-layout">
+            
+            <!-- PANEL PRINCIPAL DEL WIZARD PASO A PASO -->
+            <div class="wizard-card">
+                
+                <!-- NAVEGACIÓN SUPERIOR DE PASOS -->
+                <nav class="wizard-nav" aria-label="Pasos de creación">
+                    <div class="step-item active" data-step="1">
+                        <span class="step-number">1</span>
+                        <span>Datos Básicos</span>
+                    </div>
+                    <div class="step-item" data-step="2">
+                        <span class="step-number">2</span>
+                        <span>Atributos</span>
+                    </div>
+                    <div class="step-item" data-step="3">
+                        <span class="step-number">3</span>
+                        <span>Habilidades</span>
+                    </div>
+                    <div class="step-item" data-step="4">
+                        <span class="step-number">4</span>
+                        <span>Rasgos & Bono</span>
+                    </div>
+                    <div class="step-item" data-step="5">
+                        <span class="step-number">5</span>
+                        <span>Tienda & Oro</span>
+                    </div>
+                </nav>
+
+                <!-- CUERPO DEL WIZARD -->
+                <div class="wizard-body">
+
+                    <!-- PASO 1: DATOS BÁSICOS -->
+                    <section id="step-content-1" class="wizard-step-content active">
+                        <div class="step-header">
+                            <h2>Paso 1: Identidad del Héroe</h2>
+                            <p>Ingresa el nombre de tu personaje y selecciona su Raza y Clase iniciales según el manual <em>Vieja Escuela</em>.</p>
+                        </div>
+
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="char-name">Nombre del Personaje *</label>
+                                <input type="text" id="char-name" class="form-control" placeholder="Ej. Aragorn, Valery, Eldrin..." required>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="select-race">Raza *</label>
+                                <select id="select-race" class="form-control" required>
+                                    <option value="">-- Selecciona una Raza --</option>
+                                    <option value="Humano">Humano (Mov: 12m - Ímpetu Emprendedor & Adaptable)</option>
+                                    <option value="Elfo">Elfo (Mov: 12m - Vista Aguda & Infravisión)</option>
+                                    <option value="Enano">Enano (Mov: 9m - Afín a la Piedra & Infravisión)</option>
+                                    <option value="Mediano">Mediano (Mov: 9m - Escurridizo & Certero)</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="select-class">Clase *</label>
+                                <select id="select-class" class="form-control" required>
+                                    <option value="">-- Selecciona una Clase --</option>
+                                    <option value="Guerrero">Guerrero (DA: d8 - Lucha con X & Ataques Múltiples)</option>
+                                    <option value="Hechicero">Hechicero (DA: d4 - Sensibilidad Mágica & Transferir Esencia)</option>
+                                    <option value="Bribón">Bribón (DA: d6 - Emboscar & Dedos Ágiles)</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Nivel Inicial & Experiencia</label>
+                                <div class="static-input-badge">Nivel 1 (0 / 1000 XP)</div>
+                            </div>
+                        </div>
+
+                        <!-- PANEL DINÁMICO DE TALENTOS DE RAZA Y CLASE -->
+                        <div class="talents-section">
+                            <h3>✨ Talentos Innatos (Registrados en BD H2)</h3>
+                            <div id="talents-display-container" class="talents-grid">
+                                <div class="empty-state">Selecciona una raza y clase para visualizar los talentos asociados.</div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- PASO 2: ATRIBUTOS (STATS 3d6 x 7) -->
+                    <section id="step-content-2" class="wizard-step-content">
+                        <div class="step-header">
+                            <h2>Paso 2: Atributos y Características</h2>
+                            <p>Lanza 7 veces 3d6. Descarta el resultado más bajo y asigna los 6 valores a tus atributos principales.</p>
+                        </div>
+
+                        <!-- ALERTA DE REGLA ESTRICTA DE DADOS -->
+                        <div class="rule-banner-warning">
+                            <strong>⚠️ REGLA OFICIAL DE LANZAMIENTO:</strong>
+                            <span>Solo se permite 1 lanzamiento de dados (3d6 × 7). <em>El primer resultado es definitivo y no se puede volver a relanzar ("Vives con tus dados").</em></span>
+                        </div>
+
+                        <div class="rolls-header-bar">
+                            <button id="btn-roll-stats" class="btn-primary">
+                                🎲 Lanzar 7x 3d6 (Tirada Única)
+                            </button>
+                            <div id="rolls-actions-bar" style="display: none;">
+                                <button id="btn-auto-discard-lowest" class="btn-secondary">
+                                    🗑️ Descartar resultado más bajo
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- POOL DE TIRADAS -->
+                        <div id="rolls-pool-container" class="rolls-pool-grid">
+                            <div class="empty-state">Haz clic en "Lanzar 7x 3d6" para generar los valores de tu personaje.</div>
+                        </div>
+
+                        <!-- TABLA DE ASIGNACIÓN A ATRIBUTOS -->
+                        <div class="step-header" style="margin-top: 2rem;">
+                            <h3 style="font-family: var(--font-heading); color: var(--primary-gold);">Asignación a Atributos Base</h3>
+                            <p>Modificadores oficial de <em>Vieja Escuela</em>: 3 (-2), 4-6 (-1), 7-14 (+0), 15-17 (+1), 18 (+2)</p>
+                        </div>
+
+                        <div id="stats-assignment-container">
+                            <div class="empty-state">Genera primero tus tiradas para asignar atributos.</div>
+                        </div>
+                    </section>
+
+                    <!-- PASO 3: HABILIDADES -->
+                    <section id="step-content-3" class="wizard-step-content">
+                        <div class="step-header">
+                            <h2>Paso 3: Entrenamiento en Habilidades</h2>
+                            <p>Distribuye 4 puntos entre las 6 habilidades. Regla estricta: Máximo +1 punto por habilidad en este nivel inicial.</p>
+                        </div>
+
+                        <div class="skills-pool-banner">
+                            <span class="pool-title">Puntos de Habilidad Disponibles:</span>
+                            <span id="skills-pool-count" class="pool-badge">4</span>
+                        </div>
+
+                        <div id="skills-list-container" class="skills-grid">
+                            <!-- Inyectado por JS -->
+                        </div>
+                    </section>
+
+                    <!-- PASO 4: RASGOS DERIVADOS Y BONO HOMEBREW -->
+                    <section id="step-content-4" class="wizard-step-content">
+                        <div class="step-header">
+                            <h2>Paso 4: Rasgos Derivados & Bono Homebrew</h2>
+                            <p>Estadísticas calculadas automáticamente según el manual (PV = Máximo del DA + Mod de CON; Defensa = 10 + Mod de DES).</p>
+                        </div>
+
+                        <div class="derived-grid">
+                            <div class="derived-card">
+                                <div class="derived-label">Dado de Aguante</div>
+                                <div id="derived-da" class="derived-val">d8</div>
+                            </div>
+                            <div class="derived-card">
+                                <div class="derived-label">Puntos de Vida (PV)</div>
+                                <div id="derived-pv" class="derived-val">8 PV</div>
+                            </div>
+                            <div class="derived-card">
+                                <div class="derived-label">Movimiento</div>
+                                <div id="derived-mov" class="derived-val">12 m</div>
+                            </div>
+                            <div class="derived-card">
+                                <div class="derived-label">Defensa (10 + DES)</div>
+                                <div id="derived-def" class="derived-val">10</div>
+                            </div>
+                        </div>
+
+                        <!-- REGLA HOMEBREW: BONO +1 SELECCIONABLE -->
+                        <div class="homebrew-box">
+                            <h3 class="homebrew-title">⚡ Modificación Homebrew: Especialización (+1)</h3>
+                            <p class="homebrew-subtitle">Selecciona uno de los tres aspectos para otorgarle un bono especial permanente de +1 a tu héroe:</p>
+
+                            <div class="bonus-buttons-grid">
+                                <button type="button" class="bonus-btn" data-bonus="INS">
+                                    <span class="bonus-btn-title">🧠 Instintos (+1)</span>
+                                    <span class="bonus-btn-desc">Reflejos de supervivencia, iniciativas y tiradas para evitar peligros.</span>
+                                </button>
+                                <button type="button" class="bonus-btn active" data-bonus="ATQ">
+                                    <span class="bonus-btn-title">⚔️ Ataque (+1)</span>
+                                    <span class="bonus-btn-desc">Precisión y puntería en tiradas de combate cuerpo a cuerpo o a distancia.</span>
+                                </button>
+                                <button type="button" class="bonus-btn" data-bonus="POD">
+                                    <span class="bonus-btn-title">🔥 Poder (+1)</span>
+                                    <span class="bonus-btn-desc">Potencia mágica arcana, concentración y Puntos de Poder (Pod) para hechizos.</span>
+                                </button>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- PASO 5: ECONOMÍA Y TIENDA BASE -->
+                    <section id="step-content-5" class="wizard-step-content">
+                        <div class="step-header">
+                            <h2>Paso 5: Economía Inicial & Tienda</h2>
+                            <p>Determina el oro inicial de tu personaje tirando 3d6 × 5 monedas de oro (mo) y equipa a tu personaje con objetos de la tienda.</p>
+                        </div>
+
+                        <!-- ALERTA DE REGLA ESTRICTA DE ORO -->
+                        <div class="rule-banner-warning">
+                            <strong>⚠️ REGLA DE ORO INICIAL:</strong>
+                            <span>El oro se tira una sola vez (3d6 × 5 mo). No se permite volver a relanzar el tesoro inicial.</span>
+                        </div>
+
+                        <div style="margin-bottom: 1.5rem;">
+                            <button id="btn-roll-gold" class="btn-primary">
+                                💰 Lanzar Oro Inicial (Tirada Única 3d6 × 5 mo)
+                            </button>
+                        </div>
+
+                        <div id="gold-roll-result-container">
+                            <div class="empty-state">Tira tus dados 3d6 para calcular el oro inicial de tu personaje.</div>
+                        </div>
+
+                        <div id="shop-main-content" class="shop-layout" style="display: none;">
+                            
+                            <!-- CATÁLOGO TIENDA -->
+                            <div>
+                                <h3 style="font-family: var(--font-heading); color: var(--primary-gold); margin-bottom: 1rem;">🏬 Tienda de Equipamiento Oficial</h3>
+                                <div id="shop-catalog-container"></div>
+                            </div>
+
+                            <!-- MONEDERO & INVENTARIO ADQUIRIDO -->
+                            <div>
+                                <div class="wallet-panel">
+                                    <h4 class="wallet-title">👛 Bolsa de Monedas</h4>
+                                    <div class="wallet-coins">
+                                        <div class="coin-row">
+                                            <span class="coin-label">Monedas de Oro (mo):</span>
+                                            <span id="wallet-mo" class="coin-val coin-mo">0 mo</span>
+                                        </div>
+                                        <div class="coin-row">
+                                            <span class="coin-label">Monedas de Plata (mp):</span>
+                                            <span id="wallet-mp" class="coin-val coin-mp">0 mp</span>
+                                        </div>
+                                        <div class="coin-row">
+                                            <span class="coin-label">Monedas de Cobre (mc):</span>
+                                            <span id="wallet-mc" class="coin-val coin-mc">0 mc</span>
+                                        </div>
+                                    </div>
+                                    <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.8rem; border-top: 1px dashed var(--border-color); padding-top: 0.5rem;">
+                                        Conversión oficial: 1 mo = 10 mp = 100 mc
+                                    </div>
+                                </div>
+
+                                <div style="margin-top: 1.5rem;">
+                                    <h4 style="font-family: var(--font-heading); color: var(--text-title); font-size: 1rem;">🎒 Inventario Comprado</h4>
+                                    <div id="inventory-list-container" class="inventory-list">
+                                        <div class="empty-state">Tu inventario está vacío.</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- BARRA DE BOTONES DE NAVEGACIÓN Y GUARDADO -->
+                    <div class="wizard-actions">
+                        <button id="btn-prev" class="btn-secondary" disabled>
+                            ← Anterior
+                        </button>
+
+                        <button id="btn-next" class="btn-primary">
+                            Siguiente →
+                        </button>
+
+                        <button id="btn-save-character" class="btn-primary" style="display: none; background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%);">
+                            💾 Finalizar y Guardar en BD H2
+                        </button>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- VISTA PREVIA LATERAL EN TIEMPO REAL (CARACTERÍSTICAS DEL HÉROE) -->
+            <aside class="preview-card" aria-label="Ficha resumida en tiempo real">
+                <div class="preview-header">
+                    <div class="preview-avatar">🛡️</div>
+                    <h3 id="preview-name" class="preview-name">Sin Nombre</h3>
+                    <span id="preview-race-class" class="preview-sub">Raza • Clase (Nivel 1)</span>
+                </div>
+
+                <div class="preview-body">
+                    <!-- ATRIBUTOS -->
+                    <div>
+                        <div class="preview-section-title">Atributos Base (Valor & Mod)</div>
+                        <div class="preview-stats-grid">
+                            <div class="preview-stat-box">
+                                <div class="preview-stat-lbl">FUE</div>
+                                <div id="preview-fue" class="preview-stat-val">-</div>
+                            </div>
+                            <div class="preview-stat-box">
+                                <div class="preview-stat-lbl">DES</div>
+                                <div id="preview-des" class="preview-stat-val">-</div>
+                            </div>
+                            <div class="preview-stat-box">
+                                <div class="preview-stat-lbl">CON</div>
+                                <div id="preview-con" class="preview-stat-val">-</div>
+                            </div>
+                            <div class="preview-stat-box">
+                                <div class="preview-stat-lbl">INT</div>
+                                <div id="preview-int" class="preview-stat-val">-</div>
+                            </div>
+                            <div class="preview-stat-box">
+                                <div class="preview-stat-lbl">SAB</div>
+                                <div id="preview-sab" class="preview-stat-val">-</div>
+                            </div>
+                            <div class="preview-stat-box">
+                                <div class="preview-stat-lbl">CAR</div>
+                                <div id="preview-car" class="preview-stat-val">-</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- COMBATE Y SOBREVIVENCIA -->
+                    <div>
+                        <div class="preview-section-title">Estadísticas de Combate</div>
+                        <div class="preview-derived-list">
+                            <div class="preview-derived-item">
+                                <span class="preview-derived-lbl">Vida (PV):</span>
+                                <span id="preview-hp" class="preview-derived-val">8 / 8</span>
+                            </div>
+                            <div class="preview-derived-item">
+                                <span class="preview-derived-lbl">Defensa:</span>
+                                <span id="preview-def" class="preview-derived-val">10</span>
+                            </div>
+                            <div class="preview-derived-item">
+                                <span class="preview-derived-lbl">Movimiento:</span>
+                                <span id="preview-mov" class="preview-derived-val">12 m</span>
+                            </div>
+                            <div class="preview-derived-item">
+                                <span class="preview-derived-lbl">Bono Homebrew:</span>
+                                <span id="preview-bonus" class="preview-derived-val">+1 ATQ</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ORO DISPONIBLE -->
+                    <div>
+                        <div class="preview-section-title">Tesoro Inicial</div>
+                        <div class="preview-derived-item">
+                            <span class="preview-derived-lbl">Oro Disponible:</span>
+                            <span id="preview-gold" class="preview-derived-val" style="color: var(--primary-gold);">0 mo</span>
+                        </div>
+                    </div>
+                </div>
+            </aside>
+
+        </div>
+    </main>
+
+    <!-- MODAL DE VISUALIZACIÓN DEL JSON RESULTANTE -->
+    <div id="json-modal" class="modal-overlay">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h3>📜 Ficha de Personaje Generada (Objeto JSON)</h3>
+                <button id="btn-close-modal" class="btn-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1rem;">
+                    Este objeto JSON empaqueta todos los datos del personaje creado en el Wizard. Ha sido enviado y guardado en la base de datos H2 (compatible con Oracle DB).
+                </p>
+                <div id="json-preview-text" class="json-code-box"></div>
+            </div>
+            <div class="modal-footer">
+                <button id="btn-copy-json" class="btn-secondary">📋 Copiar JSON</button>
+                <button id="btn-download-json" class="btn-primary">💾 Descargar Archivo JSON</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- SCRIPTS EN ORDEN DE DEPENDENCIA -->
+    <script src="js/data.js"></script>
+    <script src="js/wizard.js"></script>
+    <script src="js/app.js"></script>
+
+</body>
+</html>
