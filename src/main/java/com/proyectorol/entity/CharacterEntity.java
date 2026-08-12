@@ -4,11 +4,11 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
-@Table(name = "personajes")
-@Getter
-@Setter
+@Table(name = "characters")
+@Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
@@ -18,62 +18,53 @@ public class CharacterEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "nombre", nullable = false)
-    private String nombre;
+    @Column(nullable = false)
+    private String name;
 
-    @Column(name = "raza", nullable = false)
-    private String raza;
+    @Column(name = "character_level", nullable = false)
+    private Integer level;
 
-    @Column(name = "clase", nullable = false)
-    private String clase;
+    @Column(nullable = false)
+    private Integer experience;
 
-    @Column(name = "nivel", nullable = false)
-    private Integer nivel;
+    // --- RELACIONES CON TABLAS MAESTRAS (HOMEBREW) ---
+    // Muchos personajes pueden elegir una misma Raza o Clase
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "race_id", nullable = false)
+    private RaceEntity race;
 
-    @Column(name = "xp", nullable = false)
-    private Integer xp;
-
-    @Column(name = "pv_actuales", nullable = false)
-    private Integer pvActuales;
-
-    @Column(name = "pv_maximos", nullable = false)
-    private Integer pvMaximos;
-
-    @Column(name = "defensa", nullable = false)
-    private Integer defensa;
-
-    @Column(name = "movimiento", nullable = false)
-    private Integer movimiento;
-
-    @Column(name = "oro", nullable = false)
-    private Integer oro;
-
-    @Column(name = "bono_homebrew")
-    private String bonoHomebrew; // INS, ATQ, POD
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "class_id", nullable = false)
+    private ClassEntity characterClass;
 
     // Relación Muchos a Uno: Varios personajes pertenecen a un Usuario
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "usuario_id")
-    private UserEntity usuario;
+    @JoinColumn(name = "user_id") // Estándar SQL en singular
+    private UserEntity user;
 
-    // Relación Uno a Uno: Atributos del personaje
-    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
-    @JoinColumn(name = "atributos_id", referencedColumnName = "id")
-    private AttributesEntity atributos;
+    // --- SECCIÓN DE OBJETOS EMBEBIDOS ---
+    // En Java se ven como objetos anidados, pero en Oracle serán columnas normales de la tabla 'characters'
 
-    // Relación Uno a Uno: Habilidades del personaje
-    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
-    @JoinColumn(name = "habilidades_id", referencedColumnName = "id")
-    private SkillsEntity habilidades;
+    @Embedded
+    private StatsEmbedded stats;
+
+    @Embedded
+    private SkillsEmbedded skills;
+
+    @Embedded
+    private DerivedStatsEmbedded derivedStats;
+
+    @Embedded
+    private EconomyEmbedded economy;
 
     // Campos JSON para inventario y talentos (compatibles con Oracle DB CLOB)
     @Lob
-    @Column(name = "inventario_json", length = 4000)
-    private String inventarioJson;
+    @Column(name = "inventory_json")
+    private String inventoryJson;
 
     @Lob
-    @Column(name = "talentos_json", length = 4000)
-    private String talentosJson;
+    @Column(name = "talents_json")
+    private String talentsJson;
 
     @Column(name = "created_at")
     private LocalDateTime createdAt;
@@ -81,8 +72,7 @@ public class CharacterEntity {
     @PrePersist
     public void prePersist() {
         this.createdAt = LocalDateTime.now();
-        if (this.nivel == null) this.nivel = 1;
-        if (this.xp == null) this.xp = 0;
-        if (this.oro == null) this.oro = 0;
+        if (this.level == null) this.level = 1;
+        if (this.experience == null) this.experience = 0;
     }
 }

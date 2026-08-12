@@ -1,10 +1,9 @@
 package com.proyectorol.controller;
 
-import com.proyectorol.entity.AttributeEntity;
 import com.proyectorol.entity.ClassEntity;
 import com.proyectorol.entity.RaceEntity;
 import com.proyectorol.entity.TalentEntity;
-import com.proyectorol.repository.AttributeRepository;
+import com.proyectorol.enums.AttributeDefinition;
 import com.proyectorol.repository.ClassRepository;
 import com.proyectorol.repository.RaceRepository;
 import com.proyectorol.repository.TalentRepository;
@@ -12,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Arrays;
 import java.util.List;
 
 @RestController
@@ -23,7 +23,6 @@ public class ReferenceDataController {
     private final TalentRepository talentRepository;
     private final RaceRepository raceRepository;
     private final ClassRepository classRepository;
-    private final AttributeRepository attributeRepository;
 
     @GetMapping("/talents")
     public ResponseEntity<List<TalentEntity>> getAllTalents() {
@@ -41,7 +40,7 @@ public class ReferenceDataController {
     }
 
     @GetMapping("/attributes")
-    public ResponseEntity<List<AttributeEntity>> getAllAttributes() {
-        return ResponseEntity.ok(attributeRepository.findAll());
+    public List<AttributeDefinition> getAttributeDictionary() {
+        return Arrays.asList(AttributeDefinition.values());
     }
 }

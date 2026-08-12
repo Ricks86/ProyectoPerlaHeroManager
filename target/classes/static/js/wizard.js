@@ -637,10 +637,24 @@ class CharacterWizard {
         this.renderInventoryList();
     }
 
+    getExactCoinBreakdown() {
+        const totalCopper = Math.round(
+            (this.character.economy.currentMo || 0) * 100 +
+            (this.character.economy.currentMp || 0) * 10 +
+            (this.character.economy.currentMc || 0)
+        );
+        const mo = Math.floor(totalCopper / 100);
+        const remCopper = totalCopper % 100;
+        const mp = Math.floor(remCopper / 10);
+        const mc = remCopper % 10;
+        return { mo, mp, mc };
+    }
+
     updateWalletDisplay() {
-        document.getElementById("wallet-mo").textContent = `${this.character.economy.currentMo} mo`;
-        document.getElementById("wallet-mp").textContent = `${this.character.economy.currentMp} mp`;
-        document.getElementById("wallet-mc").textContent = `${this.character.economy.currentMc} mc`;
+        const coins = this.getExactCoinBreakdown();
+        document.getElementById("wallet-mo").textContent = `${coins.mo} mo`;
+        document.getElementById("wallet-mp").textContent = `${coins.mp} mp`;
+        document.getElementById("wallet-mc").textContent = `${coins.mc} mc`;
     }
 
     renderShopCatalog() {
@@ -661,7 +675,9 @@ class CharacterWizard {
             grid.className = "shop-items-grid";
 
             itemsInCat.forEach(item => {
-                const canAfford = this.character.economy.currentMo >= item.priceMo;
+                const currentCoins = this.getExactCoinBreakdown();
+                const totalMoAvailable = currentCoins.mo + (currentCoins.mp / 10) + (currentCoins.mc / 100);
+                const canAfford = totalMoAvailable >= item.priceMo;
                 const card = document.createElement("div");
                 card.className = `shop-item-card ${canAfford ? '' : 'cannot-afford'}`;
                 card.innerHTML = `
@@ -688,12 +704,20 @@ class CharacterWizard {
     }
 
     buyShopItem(item) {
-        if (this.character.economy.currentMo < item.priceMo) {
+        const currentCoins = this.getExactCoinBreakdown();
+        const totalMoAvailable = currentCoins.mo + (currentCoins.mp / 10) + (currentCoins.mc / 100);
+
+        if (totalMoAvailable < item.priceMo) {
             alert("No tienes suficiente oro para comprar este objeto.");
             return;
         }
 
-        this.character.economy.currentMo = parseFloat((this.character.economy.currentMo - item.priceMo).toFixed(2));
+        const newTotalMo = totalMoAvailable - item.priceMo;
+        const totalCopper = Math.round(newTotalMo * 100);
+        this.character.economy.currentMo = Math.floor(totalCopper / 100);
+        const remCopper = totalCopper % 100;
+        this.character.economy.currentMp = Math.floor(remCopper / 10);
+        this.character.economy.currentMc = remCopper % 10;
 
         const existing = this.character.inventory.find(i => i.id === item.id);
         if (existing) {
@@ -717,8 +741,15 @@ class CharacterWizard {
         if (itemIdx === -1) return;
 
         const item = this.character.inventory[itemIdx];
+        const currentCoins = this.getExactCoinBreakdown();
+        const totalMoAvailable = currentCoins.mo + (currentCoins.mp / 10) + (currentCoins.mc / 100);
+        const newTotalMo = totalMoAvailable + item.priceInMo;
+        const totalCopper = Math.round(newTotalMo * 100);
 
-        this.character.economy.currentMo = parseFloat((this.character.economy.currentMo + item.priceInMo).toFixed(2));
+        this.character.economy.currentMo = Math.floor(totalCopper / 100);
+        const remCopper = totalCopper % 100;
+        this.character.economy.currentMp = Math.floor(remCopper / 10);
+        this.character.economy.currentMc = remCopper % 10;
 
         if (item.quantity > 1) {
             item.quantity--;
@@ -790,7 +821,12 @@ class CharacterWizard {
         document.getElementById("preview-mov").textContent = `${this.character.derivedStats.movement} m`;
         document.getElementById("preview-bonus").textContent = `+1 ${this.character.derivedStats.bonusChoice}`;
 
-        document.getElementById("preview-gold").textContent = `${this.character.economy.currentMo} mo`;
+        const coins = this.getExactCoinBreakdown();
+        let displayGold = `${coins.mo} mo`;
+        if (coins.mp > 0 || coins.mc > 0) {
+            displayGold += ` ${coins.mp} mp ${coins.mc} mc`;
+        }
+        document.getElementById("preview-gold").textContent = displayGold;
     }
 
     // ==========================================
@@ -812,6 +848,7 @@ class CharacterWizard {
             classData.talents.forEach(t => talentsList.push({ name: t.name, origin: "Clase", description: t.description }));
         }
 
+        const coins = this.getExactCoinBreakdown();
         const payload = {
             name: this.character.name,
             race: this.character.race,
@@ -846,9 +883,9 @@ class CharacterWizard {
                 startingGoldRoll: this.character.economy.startingGoldRoll,
                 initialGoldInMo: this.character.economy.initialGoldInMo,
                 remainingCoins: {
-                    mo: Math.floor(this.character.economy.currentMo),
-                    mp: this.character.economy.currentMp,
-                    mc: this.character.economy.currentMc
+                    mo: coins.mo,
+                    mp: coins.mp,
+                    mc: coins.mc
                 }
             },
             inventory: this.character.inventory,
@@ -857,21 +894,8 @@ class CharacterWizard {
 
         const jsonString = JSON.stringify(payload, null, 2);
 
-        try {
-            const response = await fetch('/api/characters', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: jsonString
-            });
-
-            if (response.ok) {
-                const savedChar = await response.json();
-                console.log("Personaje guardado exitosamente en Spring Boot H2 DB:", savedChar);
-            }
-        } catch (err) {
-            console.warn("Backend API en localhost:8080 no alcanzable en este momento. Se muestra el JSON localmente.", err);
+        if (typeof window.saveCharacter === "function") {
+            await window.saveCharacter(payload);
         }
 
         document.getElementById("json-preview-text").textContent = jsonString;

@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Table(name = "usuarios")
+@Table(name = "users")
 @Getter
 @Setter
 @Builder
@@ -23,26 +23,34 @@ public class UserEntity {
     @Column(nullable = false, unique = true, length = 50)
     private String username;
 
+    // Lista para recibir el hash de BCrypt (60 caracteres)
     @Column(nullable = false, length = 100)
-    private String password; // Texto plano por ahora según requerimiento
+    private String password;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
-    private UserRole role; // DM o JUGADOR
+    private UserRole role; // Asegúrate de que tu Enum UserRole tenga los valores PLAYER y DM
 
-    // Relación Uno a Muchos con Personajes
+    // Relación Uno a Muchos con Characters (Inglés unificado)
     @Builder.Default
-    @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<CharacterEntity> personajes = new ArrayList<>();
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<CharacterEntity> characters = new ArrayList<>();
 
     // Métodos helper para sincronizar relación bidireccional
-    public void addPersonaje(CharacterEntity personaje) {
-        personajes.add(personaje);
-        personaje.setUsuario(this);
+    public void addCharacter(CharacterEntity character) {
+        characters.add(character);
+        character.setUser(this);
     }
 
-    public void removePersonaje(CharacterEntity personaje) {
-        personajes.remove(personaje);
-        personaje.setUsuario(null);
+    public void removeCharacter(CharacterEntity character) {
+        characters.remove(character);
+        character.setUser(null);
+    }
+
+    @PrePersist
+    public void prePersist() {
+        if (this.role == null) {
+            this.role = UserRole.PLAYER; // Asignación segura del Enum por defecto
+        }
     }
 }

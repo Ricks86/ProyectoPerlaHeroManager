@@ -9,5 +9,6 @@ import java.util.List;
 @Repository
 public interface CharacterRepository extends JpaRepository<CharacterEntity, Long> {
     List<CharacterEntity> findByNameContainingIgnoreCase(String name);
-    List<CharacterEntity> findByCharacterClass(String characterClass);
+    List<CharacterEntity> findByCharacterClass_Name(String className);
+    List<CharacterEntity> findByRace_Name(String raceName);
 }

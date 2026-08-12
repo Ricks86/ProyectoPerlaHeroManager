@@ -15,13 +15,10 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/characters")
 @CrossOrigin(origins = "*") // Permite llamadas desde cualquier cliente estático o puerto local
+@RequiredArgsConstructor
 public class CharacterController {
 
     private final CharacterService characterService;
-
-    public CharacterController(CharacterService characterService) {
-        this.characterService = characterService;
-    }
 
     /**
      * Endpoint para recibir y guardar el objeto JSON del personaje creado en el Wizard.
@@ -52,5 +49,27 @@ public class CharacterController {
     public ResponseEntity<CharacterDTO> getCharacterById(@PathVariable Long id) {
         CharacterDTO character = characterService.getCharacterById(id);
         return ResponseEntity.ok(character);
+    }
+
+    /**
+     * Endpoint para actualizar un personaje por ID.
+     * PUT /api/characters/{id}
+     */
+    @PutMapping("/{id}")
+    public ResponseEntity<CharacterDTO> updateCharacter(@PathVariable Long id, @Valid @RequestBody CharacterDTO characterDTO) {
+        log.info("Recibida petición PUT para actualizar personaje con id: {}", id);
+        CharacterDTO updatedCharacter = characterService.updateCharacter(id, characterDTO);
+        return ResponseEntity.ok(updatedCharacter);
+    }
+
+    /**
+     * Endpoint para eliminar un personaje por ID.
+     * DELETE /api/characters/{id}
+     */
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteCharacter(@PathVariable Long id) {
+        log.info("Recibida petición DELETE para eliminar personaje con id: {}", id);
+        characterService.deleteCharacter(id);
+        return ResponseEntity.noContent().build();
     }
 }

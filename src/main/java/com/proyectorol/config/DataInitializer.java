@@ -1,10 +1,8 @@
 package com.proyectorol.config;
 
-import com.proyectorol.entity.AttributeEntity;
 import com.proyectorol.entity.ClassEntity;
 import com.proyectorol.entity.RaceEntity;
 import com.proyectorol.entity.TalentEntity;
-import com.proyectorol.repository.AttributeRepository;
 import com.proyectorol.repository.ClassRepository;
 import com.proyectorol.repository.RaceRepository;
 import com.proyectorol.repository.TalentRepository;
@@ -21,7 +19,6 @@ public class DataInitializer implements CommandLineRunner {
     private final TalentRepository talentRepository;
     private final RaceRepository raceRepository;
     private final ClassRepository classRepository;
-    private final AttributeRepository attributeRepository;
 
     @Override
     public void run(String... args) throws Exception {
@@ -30,7 +27,6 @@ public class DataInitializer implements CommandLineRunner {
         seedTalents();
         seedRaces();
         seedClasses();
-        seedAttributes();
 
         log.info("Sembrado de datos de referencia completado con éxito.");
     }
@@ -121,52 +117,6 @@ public class DataInitializer implements CommandLineRunner {
                 .weaponArmorProficiency("Puedes usar cualquier arma pero solo armaduras ligeras (cuero).")
                 .description("Ganas los talentos Emboscar y Dedos Ágiles. Puedes usar cualquier arma pero solo armaduras ligeras (cuero). Dado de Aguante (DA): d6.")
                 .talentNamesCsv("Emboscar,Dedos Ágiles")
-                .build());
-    }
-
-    private void seedAttributes() {
-        if (attributeRepository.count() > 0) return;
-
-        attributeRepository.save(AttributeEntity.builder()
-                .code("FUE")
-                .name("Fuerza")
-                .description("Capacidad física y potencia de impacto.")
-                .instinctUses("Resistir la paralización, resistir la petrificación, etc. Añade modificador a ataques cuerpo a cuerpo y daño.")
-                .build());
-
-        attributeRepository.save(AttributeEntity.builder()
-                .code("DES")
-                .name("Destreza")
-                .description("Agilidad, reflejos y coordinación motora.")
-                .instinctUses("Evitar caer por un pozo, esquivar un proyectil en el último segundo, esquivar un arma de aliento o bola de fuego. Suma a Defensa y proyectiles.")
-                .build());
-
-        attributeRepository.save(AttributeEntity.builder()
-                .code("CON")
-                .name("Constitución")
-                .description("Resistencia física, vitalidad y salud corporal.")
-                .instinctUses("Resistir un veneno, sobreponerse a una enfermedad, evitar un contagio, etc. Suma modificador a los Puntos de Vida por nivel.")
-                .build());
-
-        attributeRepository.save(AttributeEntity.builder()
-                .code("INT")
-                .name("Inteligencia")
-                .description("Razonamiento, memoria y aptitud mágica arcana.")
-                .instinctUses("Resistir el control mental sutil o la influencia no evidente. Otorga Puntos de Poder (Pod) adicionales para Hechiceros.")
-                .build());
-
-        attributeRepository.save(AttributeEntity.builder()
-                .code("SAB")
-                .name("Sabiduría")
-                .description("Percepción, fuerza de voluntad y salud mental.")
-                .instinctUses("Resistirse a una ilusión, evitar mirar un glifo o símbolo mágico, etc. Mide la Salud Mental del aventurero.")
-                .build());
-
-        attributeRepository.save(AttributeEntity.builder()
-                .code("CAR")
-                .name("Carisma")
-                .description("Presencia personal, liderazgo y encanto.")
-                .instinctUses("Cualquier efecto de control mental directo o intento evidente de influencia.")
                 .build());
     }
 }
