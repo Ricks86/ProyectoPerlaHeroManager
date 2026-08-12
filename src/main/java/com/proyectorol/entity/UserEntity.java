@@ -31,6 +31,9 @@ public class UserEntity {
     @Column(nullable = false, length = 20)
     private UserRole role; // Asegúrate de que tu Enum UserRole tenga los valores PLAYER y DM
 
+    @Column(name = "session_token", length = 255)
+    private String sessionToken;
+
     // Relación Uno a Muchos con Characters (Inglés unificado)
     @Builder.Default
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)

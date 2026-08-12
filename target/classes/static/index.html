@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="ProyectoRol - Gestor de Partidas de Rol de Tablero en Tiempo Real. Asistente de Creación de Personajes (Sistema Vieja Escuela + Homebrew)">
-    <title>Creación de Personaje | ProyectoRol</title>
+    <meta name="description" content="Costa de la Perla - Gestor de Partidas TTRPG en Tiempo Real. Autenticación, Dashboard y Asistente de Creación (Sistema Vieja Escuela + Homebrew)">
+    <title>Costa de la Perla | Gestor de Partidas TTRPG</title>
     <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
@@ -15,23 +15,147 @@
             <div class="brand-wrapper">
                 <div class="brand-logo">⚔️</div>
                 <div>
-                    <h1 class="brand-title">ProyectoRol</h1>
+                    <h1 class="brand-title">Costa de la Perla</h1>
                     <span class="brand-subtitle">Gestor de Partidas TTRPG en Tiempo Real</span>
                 </div>
             </div>
+            
+            <!-- INFORMACIÓN DEL USUARIO LOGUEADO Y ACCIONES DE HEADER -->
+            <div id="header-user-nav" class="header-user-nav" style="display: none;">
+                <div class="user-badge-info">
+                    <span class="user-avatar">👤</span>
+                    <span id="header-user-name" class="user-name">Aventurero</span>
+                </div>
+                <button id="btn-header-logout" class="btn-secondary btn-sm">🚪 Cerrar Sesión</button>
+            </div>
+
             <div class="system-badge">
-                📜 Sistema Vieja Escuela (Manual Oficial VE_jdr.pdf)
+                📜 Sistema Vieja Escuela
             </div>
         </div>
     </header>
 
-    <!-- CONTENIDO PRINCIPAL -->
+    <!-- CONTENIDO PRINCIPAL DE LA APLICACIÓN -->
     <main class="main-content">
-        <div class="wizard-layout">
+
+        <!-- ================================================================== -->
+        <!-- VISTA 1: AUTENTICACIÓN (LOGIN Y REGISTRO) -->
+        <!-- ================================================================== -->
+        <section id="auth-view" class="auth-wrapper">
+            <div class="auth-card">
+                <div class="auth-card__header">
+                    <div class="auth-card__logo">🏰</div>
+                    <h2 class="auth-card__title">Costa de la Perla</h2>
+                    <p class="auth-card__subtitle">Entra al Reino de Aventuras y Gestiona tus Héroes</p>
+                </div>
+
+                <!-- PESTAÑAS INTERCAMBIABLES -->
+                <div class="auth-card__tabs">
+                    <button id="tab-login" class="auth-tab auth-tab--active">Iniciar Sesión</button>
+                    <button id="tab-register" class="auth-tab">Registrarse</button>
+                </div>
+
+                <div class="auth-card__body">
+                    
+                    <!-- FORMULARIO 1: INICIAR SESIÓN -->
+                    <form id="form-login" class="auth-form" autocomplete="on">
+                        <div class="form-group">
+                            <label for="login-username" class="form-label">Nombre de Usuario *</label>
+                            <input type="text" id="login-username" class="form-control" placeholder="Tu nombre de héroe..." required>
+                        </div>
+                        <div class="form-group">
+                            <label for="login-password" class="form-label">Contraseña *</label>
+                            <input type="password" id="login-password" class="form-control" placeholder="••••••••" required>
+                        </div>
+                        <button type="submit" class="btn-primary btn-full">
+                            🛡️ Entrar a la Taberna (Iniciar Sesión)
+                        </button>
+                        <div class="form-toggle-footer">
+                            <span>¿Aún no posees una cuenta?</span>
+                            <a href="#" id="link-show-register" class="auth-toggle-link">Registra tu Héroe aquí</a>
+                        </div>
+                    </form>
+
+                    <!-- FORMULARIO 2: REGISTRO DE NUEVO USUARIO -->
+                    <form id="form-register" class="auth-form" style="display: none;" autocomplete="on">
+                        <div class="form-group">
+                            <label for="register-username" class="form-label">Nombre de Usuario Deseado *</label>
+                            <input type="text" id="register-username" class="form-control" placeholder="Ej. Aragorn, Eldrin..." required>
+                        </div>
+                        <div class="form-group">
+                            <label for="register-password" class="form-label">Contraseña Segura *</label>
+                            <input type="password" id="register-password" class="form-control" placeholder="Mínimo 4 caracteres..." required minlength="4">
+                        </div>
+                        <button type="submit" class="btn-primary btn-full" style="background: linear-gradient(135deg, #e67e22 0%, #d35400 100%);">
+                            📜 Jurar Lealtad (Registrarse)
+                        </button>
+                        <div class="form-toggle-footer">
+                            <span>¿Ya eres miembro de la orden?</span>
+                            <a href="#" id="link-show-login" class="auth-toggle-link">Inicia sesión aquí</a>
+                        </div>
+                    </form>
+
+                </div>
+            </div>
+        </section>
+
+
+        <!-- ================================================================== -->
+        <!-- VISTA 2: DASHBOARD ("TUS PERSONAJES") -->
+        <!-- ================================================================== -->
+        <section id="dashboard-view" class="dashboard-wrapper" style="display: none;">
+            
+            <!-- BANNER DE BIENVENIDA -->
+            <div class="dashboard-banner">
+                <div class="dashboard-banner__info">
+                    <h2>🏰 Bienvenida a Costa de la Perla, <span id="user-display-name" class="highlight-gold">Aventurero</span></h2>
+                    <p>Gestiona tus partidas en tiempo real y consulta las fichas de tus héroes.</p>
+                </div>
+                <div class="dashboard-banner__role">
+                    <span class="role-title">Rol en el Reino:</span>
+                    <span id="user-role-badge" class="role-badge">PLAYER</span>
+                </div>
+            </div>
+
+            <!-- BARRA DE ACCIÓN Y TÍTULO DE SECCIÓN -->
+            <div class="dashboard-action-bar">
+                <div class="dashboard-section-title">
+                    <h3>⚔️ Tus Personajes</h3>
+                    <span class="dashboard-subtitle">Fichas creadas con el Sistema Vieja Escuela</span>
+                </div>
+                <div class="dashboard-action-buttons">
+                    <button id="btn-open-create-wizard" class="btn-primary">
+                        ➕ Agregar Nuevo Personaje
+                    </button>
+                    <button id="btn-dashboard-logout" class="btn-secondary">
+                        🚪 Cerrar Sesión
+                    </button>
+                </div>
+            </div>
+
+            <!-- GRID CUADRÍCULA DE PERSONAJES -->
+            <div id="character-grid" class="character-grid-container">
+                <!-- Se llena dinámicamente con las tarjetas de personaje por JavaScript -->
+            </div>
+
+        </section>
+
+
+        <!-- ================================================================== -->
+        <!-- VISTA 3: WIZARD ASISTENTE DE CREACIÓN DE PERSONAJE -->
+        <!-- ================================================================== -->
+        <section id="wizard-view" class="wizard-layout" style="display: none;">
             
             <!-- PANEL PRINCIPAL DEL WIZARD PASO A PASO -->
             <div class="wizard-card">
                 
+                <!-- BOTÓN PARA REGRESAR AL DASHBOARD DESDE EL WIZARD -->
+                <div class="wizard-top-bar">
+                    <button id="btn-back-to-dashboard" class="btn-secondary btn-sm">
+                        ← Volver a Tus Personajes
+                    </button>
+                </div>
+
                 <!-- NAVEGACIÓN SUPERIOR DE PASOS -->
                 <nav class="wizard-nav" aria-label="Pasos de creación">
                     <div class="step-item active" data-step="1">
@@ -101,7 +225,7 @@
 
                         <!-- PANEL DINÁMICO DE TALENTOS DE RAZA Y CLASE -->
                         <div class="talents-section">
-                            <h3>✨ Talentos Innatos (Registrados en BD H2)</h3>
+                            <h3>✨ Talentos Innatos (Registrados en BD H2 / Oracle)</h3>
                             <div id="talents-display-container" class="talents-grid">
                                 <div class="empty-state">Selecciona una raza y clase para visualizar los talentos asociados.</div>
                             </div>
@@ -288,7 +412,7 @@
                         </button>
 
                         <button id="btn-save-character" class="btn-primary" style="display: none; background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%);">
-                            💾 Finalizar y Guardar en BD H2
+                            💾 Finalizar y Guardar Héroe
                         </button>
                     </div>
 
@@ -369,7 +493,8 @@
                 </div>
             </aside>
 
-        </div>
+        </section>
+
     </main>
 
     <!-- MODAL DE VISUALIZACIÓN DEL JSON RESULTANTE -->

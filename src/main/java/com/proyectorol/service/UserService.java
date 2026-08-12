@@ -71,4 +71,14 @@ public class UserService {
                 .role(entity.getRole())
                 .build();
     }
+
+    @Transactional
+    public void saveSessionToken(Long userId, String token) {
+        UserEntity user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado en la base de datos."));
+
+        user.setSessionToken(token);
+        userRepository.save(user);
+        log.info("Token de sesión guardado para el usuario ID: {}", userId);
+    }
 }

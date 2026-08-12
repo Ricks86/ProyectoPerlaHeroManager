@@ -17,7 +17,7 @@ import java.util.UUID;
 
 @Slf4j
 @RestController
-@RequestMapping("/api/v1/users")
+@RequestMapping({"/api/v1/users", "/api/users"})
 @CrossOrigin(origins = "*")
 @RequiredArgsConstructor
 public class UserController {
@@ -52,6 +52,13 @@ public class UserController {
 
             // Crear cookie HttpOnly con la sesión
             String sessionId = UUID.randomUUID().toString();
+
+            // AHORA SÍ: El servidor recordará quién es el dueño de esta cookie
+            userService.saveSessionToken(user.getId(), sessionId);
+
+            // TODO: Guardar este sessionId en la base de datos asociado al usuario para recordarlo después
+            // userService.saveSessionToken(user.getId(), sessionId);
+
             Cookie sessionCookie = new Cookie("SESSION_ID", sessionId);
             sessionCookie.setHttpOnly(true);
             sessionCookie.setPath("/");
@@ -59,11 +66,11 @@ public class UserController {
 
             response.addCookie(sessionCookie);
 
+            // El JSON va limpio, sin exponer el token de seguridad
             Map<String, Object> responseBody = Map.of(
                     "message", "Login exitoso",
                     "username", user.getUsername(),
-                    "role", user.getRole(),
-                    "sessionId", sessionId
+                    "role", user.getRole()
             );
 
             return ResponseEntity.ok(responseBody);

@@ -14,5 +14,7 @@ public interface UserRepository extends JpaRepository<UserEntity, Long> {
 
     // Método útil para el registro: verificar si el nombre ya está tomado
     boolean existsByUsername(String username);
+
+    Optional<UserEntity> findBySessionToken(String sessionToken);
 }
 
